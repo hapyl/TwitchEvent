@@ -1,0 +1,9 @@
+name: TwitchEvent
+version: '1.0-SNAPSHOT'
+main: me.hapyl.twitch.Main
+api-version: '1.21.3'
+author: 'hapyl'
+libraries:
+  - "org.java-websocket:Java-WebSocket:1.5.2"
+commands:
+  twitch:
