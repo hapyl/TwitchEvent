@@ -1,5 +1,6 @@
 package me.hapyl.twitch.reward.action;
 
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import me.hapyl.twitch.IllegalParameterException;
 import me.hapyl.twitch.TwitchUser;
 import me.hapyl.twitch.reward.action.param.ParameterGetter;
@@ -49,7 +50,13 @@ public class SpawnEntityTAction extends TAction {
         return uniform;
     }), UniformNumber.of(1));
 
-    private final ParameterGetter<String> nbt = ParameterGetter.ofDefault("nbt", string -> string, "{}");
+    private final ParameterGetter<CompoundTag> nbt = ParameterGetter.ofDefault("nbt", string -> {
+        try {
+            return TagParser.parseTag(string);
+        } catch (CommandSyntaxException e) {
+            throw new IllegalArgumentException("Invalid nbt! " + e.getMessage());
+        }
+    }, new CompoundTag());
 
     public SpawnEntityTAction(@NonNull String name) {
         super(name);
@@ -65,7 +72,7 @@ public class SpawnEntityTAction extends TAction {
         final EntityType entityType = params.get(this.entityType);
         final boolean chance = params.get(this.chance);
         final int amount = params.get(this.amount).asInt();
-        final String nbt = params.get(this.nbt);
+        final CompoundTag nbt = params.get(this.nbt);
 
         if (!chance) {
             return false;
@@ -90,10 +97,8 @@ public class SpawnEntityTAction extends TAction {
                 });
 
                 // Apply nbt
-                if (!nbt.equals(this.nbt.defaultValue())) {
+                if (!nbt.isEmpty()) {
                     try {
-                        final CompoundTag compoundTag = TagParser.parseTag(nbt);
-
                         // Have to use fucking reflection because spigot is being annoying
                         final Method method = entity.getClass().getMethod("getHandle");
                         final net.minecraft.world.entity.Entity mcEntity = (net.minecraft.world.entity.Entity) method.invoke(entity);
@@ -101,8 +106,8 @@ public class SpawnEntityTAction extends TAction {
                         final CompoundTag newNbt = new CompoundTag();
                         mcEntity.save(newNbt);
 
-                        compoundTag.merge(newNbt);
-                        mcEntity.load(compoundTag);
+                        newNbt.merge(nbt);
+                        mcEntity.load(newNbt);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
