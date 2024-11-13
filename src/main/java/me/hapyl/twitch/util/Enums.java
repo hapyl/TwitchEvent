@@ -9,7 +9,7 @@ public final class Enums {
     @Nullable
     public static <E extends Enum<E>> E byName(@NonNull Class<E> enumClass, @NotNull String name) {
         try {
-            return Enum.valueOf(enumClass, name);
+            return Enum.valueOf(enumClass, name.toUpperCase());
         } catch (Exception e) {
             return null;
         }

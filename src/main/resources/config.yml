@@ -1,18 +1,19 @@
-# Награды исполняются по очереди.
-# Это контролирует время перед исполнением следующей награды, в секундах.
+# сколько надо ждатб
 redemption_rate: 5
 
-# Список наград и их действия
+# всем или рандомна???
+shared_punishment: true
+
 rewards:
-  spawn_creeper: # Кодовой имя награды, должно быть разное для ВСЕХ наград
-    reward_name: "Заспавнить Крипера" # Название награды на ТВИЧЕ, должно совпадать 100%
-    message: "{user} заспавнил крипера!" # Сообщение, которое будет показано при исполнении этой награды
-    message_failed: "Не повезло!" # Сообщение, который будет показано если награда не исполнилась ( шанс не прошел, и тд. )
+  spawn_creeper:
+    reward_name: "Заспавнить Крипера" #
+    message: "{user} заспавнил крипера!"
+    message_failed: "Не повезло!"
     action:
-      name: "spawn_entity" # Название функции которая исполниться, см. Туториал для доступных функций
-      parameters: # Список параметров, для разных функций нужны свои параметры, см. Туториал
-        entity_type: "CREEPER" # Тип сущности для спавна
-        chance: 50 # Шанс спавна, 50% в денном случае
+      name: "spawn_entity"
+      parameters:
+        entity_type: "CREEPER"
+        chance: 50
   clear_inventory:
     reward_name: "Очистить Инвентарь"
     message: "{user}: Стример, а где вещи?"
@@ -21,3 +22,27 @@ rewards:
       name: "clear_inventory"
       parameters:
         chance: 20
+  add_random_effect:
+    reward_name: "Рандом Эффект"
+    action:
+      name: "add_effect"
+      parameters:
+        effects: "strength:1:5s,speed:2:10s"
+        is_random: true # true - выбирает один из эффектов; false - выбирает все
+  drop_held_item:
+    reward_name: "Дропнуть Предмет"
+    action:
+      name: "drop_held_item"
+      parameters:
+        chance: 50
+  teleport_randomly:
+    reward_name: "Рандом Телепорт"
+    action:
+      name: "teleport_nearby"
+  block_sneaking:
+    reward_name: "sneak"
+    action:
+      name: "block_action"
+      parameters:
+        action: "SNEAK"
+        duration: 60

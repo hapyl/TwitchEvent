@@ -1,10 +1,10 @@
 package me.hapyl.twitch.reward;
 
 import com.google.common.collect.Maps;
+import me.hapyl.twitch.IllegalParameterException;
 import me.hapyl.twitch.Main;
 import me.hapyl.twitch.YamlConfig;
-import me.hapyl.twitch.reward.action.ExpectedParameterKeySet;
-import me.hapyl.twitch.reward.action.ParameterList;
+import me.hapyl.twitch.reward.action.param.ParameterList;
 import me.hapyl.twitch.reward.action.TAction;
 import me.hapyl.twitch.reward.action.TActions;
 import me.hapyl.twitch.util.Message;
@@ -15,7 +15,6 @@ import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 
 import java.util.Map;
-import java.util.Set;
 
 public class RewardRegistry {
 
@@ -89,19 +88,12 @@ public class RewardRegistry {
 
                 // Read parameters
                 final ConfigurationSection parameters = rewards.getConfigurationSection("%s.action.parameters".formatted(key));
-                final ExpectedParameterKeySet exceptedParameters = action.getExceptedParameters();
 
-                ParameterList parameterList = null;
+                ParameterList parameterList = ParameterList.EMPTY;
 
                 // If param section is null and expected params also null we don't really care
-                if (parameters == null) {
-                    if (!exceptedParameters.isEmpty()) {
-                        errorLoadingReward(key, "Для этой награды нужно поля 'parameters'!");
-                        return;
-                    }
-                }
                 // Else process parameters
-                else {
+                if (parameters != null) {
                     final Map<String, String> parameterMap = Maps.newHashMap();
 
                     parameters.getKeys(false).forEach(parameter -> {
@@ -110,17 +102,15 @@ public class RewardRegistry {
                         parameterMap.put(parameter, value);
                     });
 
-                    // Check for missing parameters
-                    final Set<String> expectedKeys = action.getExceptedParameters().getKeys().keySet();
-
-                    for (String expectedKey : expectedKeys) {
-                        if (!parameterMap.containsKey(expectedKey)) {
-                            errorLoadingReward(rewardName, "Отсутствует параметр '%s'!".formatted(expectedKey));
-                            return;
-                        }
-                    }
-
                     parameterList = new ParameterList(parameterMap);
+                }
+
+                // Validate parameters
+                try {
+                    action.validateParameters(parameterList);
+                } catch (IllegalParameterException ex) {
+                    errorLoadingReward(key, ex.getMessage());
+                    return;
                 }
 
                 // Load reward

@@ -1,4 +1,4 @@
-package me.hapyl.twitch.reward.action;
+package me.hapyl.twitch.reward.action.param;
 
 import me.hapyl.twitch.util.Enums;
 import org.bukkit.entity.EntityType;

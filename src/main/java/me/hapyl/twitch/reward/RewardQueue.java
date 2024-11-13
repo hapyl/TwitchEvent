@@ -2,7 +2,7 @@ package me.hapyl.twitch.reward;
 
 import com.google.common.collect.Lists;
 import me.hapyl.twitch.TwitchUser;
-import me.hapyl.twitch.reward.action.ParameterList;
+import me.hapyl.twitch.reward.action.param.ParameterList;
 import me.hapyl.twitch.util.Message;
 import org.bukkit.scheduler.BukkitRunnable;
 

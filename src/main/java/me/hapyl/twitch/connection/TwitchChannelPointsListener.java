@@ -38,6 +38,7 @@ public class TwitchChannelPointsListener extends WebSocketClient {
     @Override
     public void onOpen(ServerHandshake handshakedata) {
         LOGGER.info("Establish connection to PubSub!");
+        Message.success("Успешное подключение к Твичу!");
 
         // Subscribe to channel points topic
         final String message = ("{\"type\": \"LISTEN\", \"nonce\": \"random_nonce\",\"data\": {\"topics\": [\"channel-points-channel-v1.%s\"],\"auth_token\": \"%s\"}}").formatted(

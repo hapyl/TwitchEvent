@@ -3,7 +3,9 @@ version: '1.0-SNAPSHOT'
 main: me.hapyl.twitch.Main
 api-version: '1.21.3'
 author: 'hapyl'
+website: "https://github.com/hapyl/TwitchEvent/wiki/Events"
 libraries:
   - "org.java-websocket:Java-WebSocket:1.5.2"
 commands:
   twitch:
+    aliases: [ "tw" ]

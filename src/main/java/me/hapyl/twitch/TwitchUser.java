@@ -4,6 +4,8 @@ import org.jetbrains.annotations.NotNull;
 
 public class TwitchUser {
 
+    public static final TwitchUser DEBUG = new TwitchUser(0, "debug", "debug");
+
     private final int id;
     private final String login;
     private final String displayName;

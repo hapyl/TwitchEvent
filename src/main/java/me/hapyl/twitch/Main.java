@@ -5,21 +5,24 @@ import me.hapyl.twitch.connection.EventSubWorker;
 import me.hapyl.twitch.reward.RewardQueue;
 import me.hapyl.twitch.reward.RewardRegistry;
 import me.hapyl.twitch.util.Strict;
-import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.scheduler.BukkitScheduler;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
+import java.util.Random;
 
 public final class Main extends JavaPlugin {
+
+    public static final Random RANDOM = new Random();
 
     private static Main main;
 
     public YamlConfig config;
     public Secret secret;
+    public EventSubWorker worker;
     public RewardRegistry registry;
     public RewardQueue queue;
+    public ScheduledRunnable runnable;
 
     @Override
     public void onEnable() {
@@ -28,12 +31,16 @@ public final class Main extends JavaPlugin {
         // Load config
         this.config = new YamlConfig("config.yml");
 
+        // Start runnable
+        this.runnable = new ScheduledRunnable();
+        this.runnable.runTaskTimer(this, 1, 1);
+
         // Load secret
         this.secret = new Secret();
 
         // Setup worker
-        final EventSubWorker worker = new EventSubWorker(this.secret);
-        worker.establishConnection();
+        this.worker = new EventSubWorker(this.secret);
+        this.worker.establishConnection();
 
         // Create registry
         this.registry = new RewardRegistry();
@@ -43,6 +50,11 @@ public final class Main extends JavaPlugin {
 
         // Register commands
         new TwitchCommand();
+    }
+
+    @Override
+    public void onDisable() {
+        this.worker.stopServer();
     }
 
     public void restartQueue() {

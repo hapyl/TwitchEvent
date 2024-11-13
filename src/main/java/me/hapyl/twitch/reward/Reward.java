@@ -1,6 +1,6 @@
 package me.hapyl.twitch.reward;
 
-import me.hapyl.twitch.reward.action.ParameterList;
+import me.hapyl.twitch.reward.action.param.ParameterList;
 import me.hapyl.twitch.reward.action.TAction;
 import org.jetbrains.annotations.Nullable;
 import org.jspecify.annotations.NonNull;
@@ -11,10 +11,9 @@ public class Reward {
     private final TAction action;
     private final String message;
     private final String messageFailed;
-    @Nullable
     private final ParameterList parameterList;
 
-    public Reward(String name, TAction action, String message, String messageFailed, @Nullable ParameterList parameterList) {
+    public Reward(String name, TAction action, String message, String messageFailed, ParameterList parameterList) {
         this.name = name;
         this.action = action;
         this.message = message;
@@ -42,7 +41,9 @@ public class Reward {
         return messageFailed;
     }
 
-    public @Nullable ParameterList getParameterList() {
+    @NonNull
+    public ParameterList getParameterList() {
         return parameterList;
     }
+
 }

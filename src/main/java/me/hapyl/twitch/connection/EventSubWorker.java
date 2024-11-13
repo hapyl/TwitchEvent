@@ -45,9 +45,6 @@ public class EventSubWorker {
 
     public void establishListener() {
         try {
-            // Close auth server now if was opened
-            this.connection.server.stop(1);
-
             this.listener = new TwitchChannelPointsListener(auth.getToken(), secret.getChannelId());
             this.listener.connect();
         } catch (Exception e) {
@@ -55,4 +52,8 @@ public class EventSubWorker {
         }
     }
 
+    public void stopServer() {
+        this.connection.server.stop(0);
+        this.listener.close();
+    }
 }
