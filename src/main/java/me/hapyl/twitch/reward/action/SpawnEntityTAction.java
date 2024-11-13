@@ -74,7 +74,7 @@ public class SpawnEntityTAction extends TAction {
         assert entityType.getEntityClass() != null : "Entity class is null somehow!";
 
         // Perform
-        forEach(player -> {
+        affectPlayers(player -> {
             final Location location = player.getLocation();
             final World world = player.getWorld();
 

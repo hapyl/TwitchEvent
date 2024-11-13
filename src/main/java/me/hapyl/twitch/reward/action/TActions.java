@@ -20,6 +20,7 @@ public class TActions {
     public static final TAction TELEPORT_NEARBY;
     public static final TAction WATER_BUCKET_CHALLENGE;
     public static final TAction BLOCK_ACTION;
+    //public static final TAction THE_FLOOR_IS_LAVA;
 
     private static final Map<String, TAction> ACTIONS;
 
@@ -33,6 +34,7 @@ public class TActions {
         TELEPORT_NEARBY = register("teleport_nearby", TeleportNearbyTAction::new);
         WATER_BUCKET_CHALLENGE = register("water_bucket_challenge", WaterBucketChallengeTAction::new);
         BLOCK_ACTION = register("block_action", BlockActionTAction::new);
+        //THE_FLOOR_IS_LAVA = register("the_floor_is_lava", TheFloorIsLavaTAction::new);
     }
 
     @Nullable

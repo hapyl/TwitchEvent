@@ -63,7 +63,7 @@ public class AddEffectTAction extends TAction {
             effects.retainAll(List.of(randomEffect));
         }
 
-        forEach(player -> {
+        affectPlayers(player -> {
             effects.forEach(player::addPotionEffect);
         });
 

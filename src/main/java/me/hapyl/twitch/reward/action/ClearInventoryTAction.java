@@ -22,7 +22,7 @@ public class ClearInventoryTAction extends TAction {
             return false;
         }
 
-        forEach(player -> {
+        affectPlayers(player -> {
             player.getInventory().clear();
         });
 

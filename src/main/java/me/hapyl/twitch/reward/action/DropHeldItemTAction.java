@@ -29,7 +29,7 @@ public class DropHeldItemTAction extends TAction {
             return false;
         }
 
-        forEach(this::doDropItem);
+        affectPlayers(this::doDropItem);
 
         return true;
     }

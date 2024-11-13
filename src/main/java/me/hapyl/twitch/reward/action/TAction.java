@@ -48,7 +48,7 @@ public abstract class TAction {
     }
 
     // Static helpers
-    protected static void forEach(@NonNull Consumer<Player> consumer) {
+    protected static void affectPlayers(@NonNull Consumer<Player> consumer) {
         final List<Player> onlinePlayers = Lists.newArrayList(Bukkit.getOnlinePlayers());
         final boolean isShared = Main.getPlugin().config.getYaml().getBoolean("shared_punishment");
 
