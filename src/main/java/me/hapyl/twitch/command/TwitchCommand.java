@@ -4,8 +4,8 @@ import me.hapyl.twitch.Main;
 import me.hapyl.twitch.TwitchUser;
 import me.hapyl.twitch.reward.Reward;
 import me.hapyl.twitch.util.Message;
-import me.hapyl.twitch.util.PlayerUtil;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jspecify.annotations.NonNull;
 
@@ -40,14 +40,14 @@ public class TwitchCommand extends ICommand {
                     return;
                 }
 
-                final boolean success = reward.getAction().perform(TwitchUser.DEBUG, reward.getParameterList());
+                if (!(sender instanceof Player player)) {
+                    Message.error("Только игроки могут вызвать награды!");
+                    return;
+                }
 
-                Message.info("Награда {%s} вызвана: %s".formatted(
-                        title,
-                        success
-                                ? "&2✔ Успех!"
-                                : "&4❌ Провал!"
-                ));
+                Main.getPlugin().queue.executeReward(player, reward, TwitchUser.DEBUG);
+
+                Message.info("Награда {%s} вызвана!".formatted(reward));
             }
             else {
                 Message.error("Неверный формат команды! {%s}".formatted("/twitch (reload, redeem) [name...]"));

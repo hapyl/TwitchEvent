@@ -7,6 +7,7 @@ import me.hapyl.twitch.reward.action.param.ParameterGetter;
 import me.hapyl.twitch.reward.action.param.ParameterList;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Registry;
+import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.NumberConversions;
@@ -54,7 +55,7 @@ public class AddEffectTAction extends TAction {
     }
 
     @Override
-    public boolean perform(@NonNull TwitchUser user, @NonNull ParameterList params) {
+    public boolean perform(@NonNull Player player, @NonNull TwitchUser user, @NonNull ParameterList params) {
         final List<PotionEffect> effects = params.get(this.effects);
         final boolean isRandom = params.get(this.isRandom);
 
@@ -63,10 +64,8 @@ public class AddEffectTAction extends TAction {
             effects.retainAll(List.of(randomEffect));
         }
 
-        affectPlayers(player -> {
-            effects.forEach(player::addPotionEffect);
-        });
-
+        effects.forEach(player::addPotionEffect);
         return true;
     }
+
 }

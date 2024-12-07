@@ -24,17 +24,11 @@ public class DropHeldItemTAction extends TAction {
     }
 
     @Override
-    public boolean perform(@NonNull TwitchUser user, @NonNull ParameterList params) {
+    public boolean perform(@NonNull Player player, @NonNull TwitchUser user, @NonNull ParameterList params) {
         if (!params.get(this.chance)) {
             return false;
         }
 
-        affectPlayers(this::doDropItem);
-
-        return true;
-    }
-
-    private void doDropItem(Player player) {
         final Location location = player.getEyeLocation();
         final Vector vector = location.getDirection().multiply(1);
         location.add(vector);
@@ -45,12 +39,9 @@ public class DropHeldItemTAction extends TAction {
 
         block.setType(Material.LAVA, false);
 
-        Tasks.later(() -> {
-            player.dropItem(true);
-        }, 2);
-
-        Tasks.later(() -> {
-            state.update(true, false);
-        }, 10);
+        Tasks.later(() -> player.dropItem(true), 2);
+        Tasks.later(() -> state.update(true, false), 10);
+        return true;
     }
+
 }

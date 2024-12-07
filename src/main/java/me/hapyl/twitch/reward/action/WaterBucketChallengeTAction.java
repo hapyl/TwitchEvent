@@ -4,7 +4,7 @@ import com.google.common.collect.Maps;
 import me.hapyl.twitch.Main;
 import me.hapyl.twitch.TwitchUser;
 import me.hapyl.twitch.reward.action.param.ParameterList;
-import me.hapyl.twitch.util.PlayerUtil;
+import me.hapyl.twitch.util.PlayerHelper;
 import me.hapyl.twitch.util.Message;
 import me.hapyl.twitch.util.Tasks;
 import org.bukkit.*;
@@ -25,7 +25,7 @@ import org.jspecify.annotations.NonNull;
 
 import java.util.Map;
 
-public class WaterBucketChallengeTAction extends TAction implements Listener {
+public class WaterBucketChallengeTAction extends TCompletableAction implements Listener {
 
     private static final int HEIGHT = 50;
     private static final int HEIGHT_NETHER = 30;
@@ -64,52 +64,50 @@ public class WaterBucketChallengeTAction extends TAction implements Listener {
     }
 
     @Override
-    public boolean perform(@NonNull TwitchUser user, @NonNull ParameterList params) {
-        affectPlayers(player -> {
-            Message.info("Готовься {%s}, Water Bucket Challenge через {%s}с!".formatted(player.getName(), DELAY_SEC));
-            PlayerUtil.playSound(player, Sound.AMBIENT_UNDERWATER_EXIT, 1.0f);
+    public boolean perform(@NonNull Player player, @NonNull TwitchUser user, @NonNull ParameterList params) {
+        Message.info("Готовься {%s}, Water Bucket Challenge через {%s}с!".formatted(player.getName(), DELAY_SEC));
+        PlayerHelper.sound(player, Sound.AMBIENT_UNDERWATER_EXIT, 1.0f);
 
-            new BukkitRunnable() {
-                private int delay = DELAY_SEC;
+        new BukkitRunnable() {
+            private int delay = DELAY_SEC;
 
-                @Override
-                public void run() {
-                    if (delay <= 0) {
-                        final WaterBucketChallenge previousChallenge = challenges.remove(player);
+            @Override
+            public void run() {
+                if (delay <= 0) {
+                    final WaterBucketChallenge previousChallenge = challenges.remove(player);
 
-                        if (previousChallenge != null) {
-                            previousChallenge.onSuccess();
-                        }
-
-                        // Don't cheat!
-                        player.closeInventory();
-
-                        PlayerUtil.sendTitle(player, "&a&lGO!", "", 10, 10, 10);
-                        PlayerUtil.playSound(player, Sound.BLOCK_NOTE_BLOCK_PLING, 2.0f);
-
-                        challenges.put(player, new WaterBucketChallenge(player));
-                        cancel();
-                    }
-                    else {
-                        final String color = delay == 3 ? "&4&l"
-                                : delay == 2 ? "&c&l"
-                                : delay == 1 ? "&e&l"
-                                : "&a&l";
-
-                        PlayerUtil.sendTitle(player,
-                                color + delay,
-                                "",
-                                0, 20, 10
-                        );
-
-                        PlayerUtil.playSound(player, Sound.BLOCK_NOTE_BLOCK_HAT, 1.0f + (1.0f * delay / DELAY_SEC));
-                        PlayerUtil.playSound(player, Sound.BLOCK_NOTE_BLOCK_BASS, 0.75f + (0.75f * delay / DELAY_SEC));
+                    if (previousChallenge != null) {
+                        previousChallenge.onSuccess();
                     }
 
-                    --delay;
+                    // Don't cheat!
+                    player.closeInventory();
+
+                    PlayerHelper.title(player, "&a&lGO!", "", 10, 10, 10);
+                    PlayerHelper.sound(player, Sound.BLOCK_NOTE_BLOCK_PLING, 2.0f);
+
+                    challenges.put(player, new WaterBucketChallenge(player));
+                    cancel();
                 }
-            }.runTaskTimer(Main.getPlugin(), 20, 20);
-        });
+                else {
+                    final String color = delay == 3 ? "&4&l"
+                            : delay == 2 ? "&c&l"
+                            : delay == 1 ? "&e&l"
+                            : "&a&l";
+
+                    PlayerHelper.title(player,
+                            color + delay,
+                            "",
+                            0, 20, 10
+                    );
+
+                    PlayerHelper.sound(player, Sound.BLOCK_NOTE_BLOCK_HAT, 1.0f + (1.0f * delay / DELAY_SEC));
+                    PlayerHelper.sound(player, Sound.BLOCK_NOTE_BLOCK_BASS, 0.75f + (0.75f * delay / DELAY_SEC));
+                }
+
+                --delay;
+            }
+        }.runTaskTimer(Main.getPlugin(), 20, 20);
 
         return true;
     }
@@ -174,6 +172,9 @@ public class WaterBucketChallengeTAction extends TAction implements Listener {
 
             // Only remove after it's we're teleported
             WaterBucketChallengeTAction.this.challenges.remove(this.player, this);
+
+            // Delay a little bit
+            Tasks.later(() -> WaterBucketChallengeTAction.this.completeAction(player), 2);
         }
 
         @Override

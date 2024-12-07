@@ -2,7 +2,6 @@ package me.hapyl.twitch.network;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.jspecify.annotations.NonNull;
 
 public class IpImpl implements Ip {
 
@@ -31,7 +30,8 @@ public class IpImpl implements Ip {
     }
 
     @Override
-    public @NonNull String getHostName() {
+    @NotNull
+    public String getHostName() {
         return hostName;
     }
 

@@ -2,24 +2,25 @@ package me.hapyl.twitch.util;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.jspecify.annotations.NonNull;
 
 public final class Message {
 
-    private static final String PREFIX = "&8[&5Twitch&8] ";
+    public static final String PREFIX = PlayerHelper.color("&8[&5Twitch&8] ");
 
-    public static void info(Object message) {
+    public static void info(@NonNull Object message) {
         send("&7" + message, "&f", "&7");
     }
 
-    public static void success(Object message) {
+    public static void success(@NonNull Object message) {
         send("&2✔ &a" + message, "&2", "&a");
     }
 
-    public static void error(Object message) {
+    public static void error(@NonNull Object message) {
         send("&4❌ &c" + message, "&4", "&c");
     }
 
-    public static void debug(Object message) {
+    public static void debug(@NonNull Object message) {
         send("&c[DEBUG] &e" + message, "&e", "&c");
     }
 

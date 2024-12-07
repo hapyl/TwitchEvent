@@ -55,7 +55,7 @@ public class TwitchChannelPointsListener extends WebSocketClient {
                 LOGGER.info("[PING] Pinging twitch...");
                 send("{\"type\": \"PING\"}");
             }
-        }, 240000, 240000);  // 240,000 ms = 4 minutes
+        }, 0, 240000);  // 240,000 ms = 4 minutes
     }
 
     @Override

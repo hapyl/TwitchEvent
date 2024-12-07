@@ -8,6 +8,7 @@ import me.hapyl.twitch.reward.action.param.ParameterGetters;
 import me.hapyl.twitch.reward.action.param.ParameterList;
 import me.hapyl.twitch.util.Enums;
 import me.hapyl.twitch.util.UniformNumber;
+import net.kyori.adventure.text.Component;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.TagParser;
 import org.bukkit.Location;
@@ -15,6 +16,7 @@ import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Monster;
+import org.bukkit.entity.Player;
 import org.jspecify.annotations.NonNull;
 
 import java.lang.reflect.Method;
@@ -68,7 +70,7 @@ public class SpawnEntityTAction extends TAction {
     }
 
     @Override
-    public boolean perform(@NonNull TwitchUser user, @NonNull ParameterList params) {
+    public boolean perform(@NonNull Player player, @NonNull TwitchUser user, @NonNull ParameterList params) {
         final EntityType entityType = params.get(this.entityType);
         final boolean chance = params.get(this.chance);
         final int amount = params.get(this.amount).asInt();
@@ -81,39 +83,37 @@ public class SpawnEntityTAction extends TAction {
         assert entityType.getEntityClass() != null : "Entity class is null somehow!";
 
         // Perform
-        affectPlayers(player -> {
-            final Location location = player.getLocation();
-            final World world = player.getWorld();
+        final Location location = player.getLocation();
+        final World world = player.getWorld();
 
-            for (int i = 0; i < amount; i++) {
-                final Entity entity = world.spawn(location, entityType.getEntityClass(), self -> {
-                    self.setCustomName(user.getDisplayName());
-                    self.setCustomNameVisible(true);
+        for (int i = 0; i < amount; i++) {
+            final Entity entity = world.spawn(location, entityType.getEntityClass(), self -> {
+                self.customName(Component.text(user.getDisplayName()));
+                self.setCustomNameVisible(true);
 
-                    // Make sure to always aggro the entity
-                    if (self instanceof Monster monster) {
-                        monster.setTarget(player);
-                    }
-                });
+                // Make sure to always aggro the entity
+                if (self instanceof Monster monster) {
+                    monster.setTarget(player);
+                }
+            });
 
-                // Apply nbt
-                if (!nbt.isEmpty()) {
-                    try {
-                        // Have to use fucking reflection because spigot is being annoying
-                        final Method method = entity.getClass().getMethod("getHandle");
-                        final net.minecraft.world.entity.Entity mcEntity = (net.minecraft.world.entity.Entity) method.invoke(entity);
+            // Apply nbt
+            if (!nbt.isEmpty()) {
+                try {
+                    // Have to use fucking reflection because spigot is being annoying
+                    final Method method = entity.getClass().getMethod("getHandle");
+                    final net.minecraft.world.entity.Entity mcEntity = (net.minecraft.world.entity.Entity) method.invoke(entity);
 
-                        final CompoundTag newNbt = new CompoundTag();
-                        mcEntity.save(newNbt);
+                    final CompoundTag newNbt = new CompoundTag();
+                    mcEntity.save(newNbt);
 
-                        newNbt.merge(nbt);
-                        mcEntity.load(newNbt);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
+                    newNbt.merge(nbt);
+                    mcEntity.load(newNbt);
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
             }
-        });
+        }
 
         return true;
     }

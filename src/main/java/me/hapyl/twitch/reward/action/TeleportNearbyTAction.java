@@ -13,24 +13,23 @@ import org.jspecify.annotations.NonNull;
 
 public class TeleportNearbyTAction extends TAction {
 
-    private final double minRadius = 5;
-    private final double maxRadius = 64;
+    private static final double minRadius = 5;
+    private static final double maxRadius = 64;
+    private static final int maxSearchTries = 20;
 
     public TeleportNearbyTAction(String name) {
         super(name);
     }
 
     @Override
-    public boolean perform(@NonNull TwitchUser user, @NonNull ParameterList params) {
+    public boolean perform(@NonNull Player player, @NonNull TwitchUser user, @NonNull ParameterList params) {
         final double radiusX = Main.RANDOM.nextDouble(minRadius, maxRadius);
         final double radiusY = Main.RANDOM.nextDouble(minRadius, maxRadius);
         final double radiusZ = Main.RANDOM.nextDouble(minRadius, maxRadius);
 
-        affectPlayers(player -> {
-            final Location location = getRandomLocation(player, radiusX, radiusY, radiusZ, 10);
+        final Location location = getRandomLocation(player, radiusX, radiusY, radiusZ, maxSearchTries);
 
-            player.teleport(location);
-        });
+        player.teleport(location);
 
         return true;
     }
@@ -40,7 +39,7 @@ public class TeleportNearbyTAction extends TAction {
         final Location location = player.getLocation();
 
         if (limit <= 0) {
-            Message.info("Не получилось найти куда телепортировать игрока!");
+            Message.error("Не получилось найти куда телепортировать игрока!");
             return location;
         }
 

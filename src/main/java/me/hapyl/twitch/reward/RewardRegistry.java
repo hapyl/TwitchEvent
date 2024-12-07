@@ -1,19 +1,25 @@
 package me.hapyl.twitch.reward;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import me.hapyl.twitch.IllegalParameterException;
 import me.hapyl.twitch.Main;
 import me.hapyl.twitch.YamlConfig;
+import me.hapyl.twitch.reward.action.TCompletableAction;
 import me.hapyl.twitch.reward.action.param.ParameterList;
 import me.hapyl.twitch.reward.action.TAction;
 import me.hapyl.twitch.reward.action.TActions;
+import me.hapyl.twitch.util.Enums;
 import me.hapyl.twitch.util.Message;
 import me.hapyl.twitch.util.Strict;
+import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.inventory.ItemStack;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 
+import java.util.List;
 import java.util.Map;
 
 public class RewardRegistry {
@@ -81,6 +87,43 @@ public class RewardRegistry {
                     return;
                 }
 
+                // Load item rewards if present
+                final List<ItemStack> itemRewards = Lists.newArrayList();
+                final ConfigurationSection itemRewardsSection = rewards.getConfigurationSection("%s.item_rewards".formatted(key));
+
+                if (itemRewardsSection != null) {
+                    // Check if the action can actually be completed
+                    if (!(action instanceof TCompletableAction)) {
+                        errorLoadingReward(key, "Награда {%s} не поддерживает награды!".formatted(key));
+                        return;
+                    }
+
+                    for (String itemId : itemRewardsSection.getKeys(false)) {
+                        final Material material = Enums.byName(Material.class, itemId);
+                        final int amount = itemRewardsSection.getInt(itemId, 1);
+
+                        if (material == null) {
+                            errorLoadingReward(key, "Неизвестный предмет: {%s}!".formatted(itemId));
+                            return;
+                        }
+
+                        if (!material.isItem()) {
+                            errorLoadingReward(
+                                    key,
+                                    "Предмет должен быть предметом, а не блоком! ({%s})".formatted(material.getKey().getKey())
+                            );
+                            return;
+                        }
+
+                        if (amount < 1 || amount > 99) {
+                            errorLoadingReward(key, "Количество предмета не может быть меньше 1 или больше 99!");
+                            return;
+                        }
+
+                        itemRewards.add(new ItemStack(material, amount));
+                    }
+                }
+
                 // Don't load ANY rewards if failed
                 if (reader.fail) {
                     return;
@@ -114,8 +157,7 @@ public class RewardRegistry {
                 }
 
                 // Load reward
-                final Reward value = new Reward(rewardName, action, message, messageFailed, parameterList);
-                registry.rewards.put(rewardName, value);
+                registry.rewards.put(rewardName, new Reward(rewardName, action, message, messageFailed, parameterList, itemRewards));
 
                 LOGGER.info("Loaded reward '%s'!".formatted(rewardName));
             }
@@ -145,6 +187,10 @@ public class RewardRegistry {
                 final String string = section.getString(key + "." + name);
 
                 return string != null ? string : def;
+            }
+
+            public boolean contains(@NonNull String name) {
+                return section.contains(name);
             }
 
             @NonNull

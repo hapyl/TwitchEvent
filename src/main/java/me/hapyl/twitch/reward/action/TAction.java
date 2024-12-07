@@ -1,20 +1,17 @@
 package me.hapyl.twitch.reward.action;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import me.hapyl.twitch.Main;
 import me.hapyl.twitch.TwitchUser;
+import me.hapyl.twitch.reward.Reward;
 import me.hapyl.twitch.reward.action.param.ParameterGetter;
 import me.hapyl.twitch.reward.action.param.ParameterList;
 import me.hapyl.twitch.util.Message;
-import org.bukkit.Bukkit;
+import me.hapyl.twitch.util.StaticFormat;
 import org.bukkit.entity.Player;
 import org.jspecify.annotations.NonNull;
 
-import java.util.Collections;
-import java.util.List;
+import javax.annotation.OverridingMethodsMustInvokeSuper;
 import java.util.Set;
-import java.util.function.Consumer;
 
 public abstract class TAction {
 
@@ -31,7 +28,7 @@ public abstract class TAction {
         return name;
     }
 
-    public abstract boolean perform(@NonNull TwitchUser user, @NonNull ParameterList params);
+    public abstract boolean perform(@NonNull Player player, @NonNull TwitchUser user, @NonNull ParameterList params);
 
     public void validateParameters(@NonNull ParameterList parameterList) {
         if (this.parameters.isEmpty() && parameterList.isEmpty()) {
@@ -43,26 +40,18 @@ public abstract class TAction {
         }
     }
 
+    @OverridingMethodsMustInvokeSuper
+    public void onSuccess(@NonNull Player player, @NonNull TwitchUser user, @NonNull Reward reward) {
+        Message.success(StaticFormat.format(reward.message(), user, player));
+    }
+
+    @OverridingMethodsMustInvokeSuper
+    public void onFail(@NonNull Player player, @NonNull TwitchUser user, @NonNull Reward reward) {
+        Message.error(StaticFormat.format(reward.messageFailed(), user, player));
+    }
+
     protected void registerParameter(@NonNull ParameterGetter<?> getter) {
         this.parameters.add(getter);
     }
 
-    // Static helpers
-    protected static void affectPlayers(@NonNull Consumer<Player> consumer) {
-        final List<Player> onlinePlayers = Lists.newArrayList(Bukkit.getOnlinePlayers());
-        final boolean isShared = Main.getPlugin().config.getYaml().getBoolean("shared_punishment");
-
-        if (onlinePlayers.isEmpty()) {
-            Message.error("Никто не онлайн!");
-            return;
-        }
-
-        if (isShared) {
-            onlinePlayers.forEach(consumer);
-        }
-        else {
-            Collections.shuffle(onlinePlayers);
-            consumer.accept(onlinePlayers.getFirst());
-        }
-    }
 }

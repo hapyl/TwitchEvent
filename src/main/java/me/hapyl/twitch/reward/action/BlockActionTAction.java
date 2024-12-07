@@ -76,7 +76,7 @@ public class BlockActionTAction extends TAction implements IScheduledTicking, Li
     }
 
     @Override
-    public boolean perform(@NonNull TwitchUser user, @NonNull ParameterList params) {
+    public boolean perform(@NonNull Player player, @NonNull TwitchUser user, @NonNull ParameterList params) {
         final Action action = params.get(this.action);
         final int duration = params.get(this.duration);
 

@@ -4,6 +4,7 @@ import me.hapyl.twitch.TwitchUser;
 import me.hapyl.twitch.reward.action.param.ParameterGetter;
 import me.hapyl.twitch.reward.action.param.ParameterGetters;
 import me.hapyl.twitch.reward.action.param.ParameterList;
+import org.bukkit.entity.Player;
 import org.jspecify.annotations.NonNull;
 
 public class ClearInventoryTAction extends TAction {
@@ -17,15 +18,12 @@ public class ClearInventoryTAction extends TAction {
     }
 
     @Override
-    public boolean perform(@NonNull TwitchUser user, @NonNull ParameterList params) {
+    public boolean perform(@NonNull Player player, @NonNull TwitchUser user, @NonNull ParameterList params) {
         if (!params.get(this.chance)) {
             return false;
         }
 
-        affectPlayers(player -> {
-            player.getInventory().clear();
-        });
-
+        player.getInventory().clear();
         return true;
     }
 }

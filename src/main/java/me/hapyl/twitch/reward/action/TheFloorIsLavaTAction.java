@@ -18,10 +18,8 @@ public class TheFloorIsLavaTAction extends TAction {
     }
 
     @Override
-    public boolean perform(@NonNull TwitchUser user, @NonNull ParameterList params) {
-        affectPlayers(player -> {
-            new TheFloorIsLava(player, player.getLocation());
-        });
+    public boolean perform(@NonNull Player player, @NonNull TwitchUser user, @NonNull ParameterList params) {
+        new TheFloorIsLava(player, player.getLocation());
         return true;
     }
 
